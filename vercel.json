@@ -1,0 +1,16 @@
+{
+	"rewrites": [
+		{
+			"source": "/:path*",
+			"destination": "/:path*.html"
+		},
+		{
+			"source": "/:path*/",
+			"destination": "/:path*/index.html"
+		}
+	],
+	"buildCommand": "npx quartz build",
+	"outputDirectory": "public",
+	"installCommand": "npm install",
+	"devCommand": "npx quartz build --watch --serve"
+}
