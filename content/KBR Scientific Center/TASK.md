@@ -1,12 +1,11 @@
 ---
 title: Задание
 ---
-
-## 📋 **TASK (Задание)**
+## 📋 **ЗАДАНИЕ (TASK)**
 
 ---
 
-### **1. СХЕМА TASK**
+### **Схема**
 
 ```javascript
 Task {
@@ -14,16 +13,16 @@ Task {
   name: string, required
   description: string
   creator: ObjectId -> User, required
-  
+
   // ========== СТАТУС ==========
   status: enum ['created', 'in_progress', 'completed', 'failed', 'cancelled'], default: 'created'
-  
+
   // ========== УЧАСТНИКИ ==========
   users: [ObjectId -> User]
   agents: [ObjectId -> Agent]
   computers: [ObjectId -> Computer]
   devices: [ObjectId -> Device]
-  
+
   // ========== РЕСУРСЫ ==========
   requiredResources: {
     gpu: number
@@ -37,14 +36,21 @@ Task {
     ram: number
     storage: number
   }
-  
+
   // ========== СВЯЗИ АГЕНТОВ С УСТРОЙСТВАМИ ==========
   agentDeviceConnections: [{
     agentId: ObjectId -> Agent
     deviceId: ObjectId -> Device
     status: enum ['pending', 'active', 'completed', 'failed']
   }]
-  
+
+  // ========== СВЯЗИ АГЕНТОВ С ВЫЧИСЛИТЕЛЯМИ ==========
+  agentComputerConnections: [{
+    agentId: ObjectId -> Agent
+    computerId: ObjectId -> Computer
+    status: enum ['pending', 'active', 'completed', 'failed']
+  }]
+
   // ========== ЧАТ ==========
   chat: {
     messages: [{
@@ -57,14 +63,14 @@ Task {
       timestamp: Date
     }]
   }
-  
+
   // ========== ТАЙМЛАЙН ==========
   timeline: [{
     event: string
     userId: ObjectId -> User
     timestamp: Date
   }]
-  
+
   // ========== РЕЗУЛЬТАТ ==========
   result: {
     type: enum ['digital', 'physical']
@@ -76,8 +82,8 @@ Task {
       estimatedCompletion: Date
     }
   }
-  
-  // ========== 3D СЦЕНА (ГОТОВАЯ ОТ НАС) ==========
+
+  // ========== 3D СЦЕНА ==========
   scene3d: {
     url: string
     animations: {
@@ -85,7 +91,7 @@ Task {
       active: string
     }
   }
-  
+
   // ========== АУДИТ ==========
   createdAt: Date
   updatedAt: Date
@@ -94,22 +100,22 @@ Task {
 
 ---
 
-### **2. ОПИСАНИЕ ПОЛЕЙ**
+### **Описание полей**
 
 ---
 
-#### **ОСНОВНЫЕ ПОЛЯ**
+#### **Основные поля**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
-| `_id` | ObjectId | Да | Уникальный ID задания |
+| `_id` | ObjectId | Да | Уникальный идентификатор задания |
 | `name` | string | Да | Название задания |
 | `description` | string | Нет | Описание задания |
 | `creator` | ObjectId -> User | Да | Кто создал задание |
 
 ---
 
-#### **СТАТУС**
+#### **Статус**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -117,7 +123,7 @@ Task {
 
 ---
 
-#### **УЧАСТНИКИ**
+#### **Участники**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -128,7 +134,7 @@ Task {
 
 ---
 
-#### **РЕСУРСЫ**
+#### **Ресурсы**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -143,7 +149,7 @@ Task {
 
 ---
 
-#### **СВЯЗИ АГЕНТОВ С УСТРОЙСТВАМИ**
+#### **Связи агентов с устройствами**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -153,7 +159,17 @@ Task {
 
 ---
 
-#### **ЧАТ**
+#### **Связи агентов с вычислителями**
+
+| Поле | Тип | Обязательное | Описание |
+|------|-----|--------------|----------|
+| `agentComputerConnections[].agentId` | ObjectId -> Agent | Да | Агент |
+| `agentComputerConnections[].computerId` | ObjectId -> Computer | Да | Вычислитель |
+| `agentComputerConnections[].status` | enum | Да | `'pending'`, `'active'`, `'completed'`, `'failed'` |
+
+---
+
+#### **Чат**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -167,7 +183,7 @@ Task {
 
 ---
 
-#### **ТАЙМЛАЙН**
+#### **Таймлайн**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -177,7 +193,7 @@ Task {
 
 ---
 
-#### **РЕЗУЛЬТАТ**
+#### **Результат**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -190,7 +206,7 @@ Task {
 
 ---
 
-#### **3D СЦЕНА**
+#### **3D сцена**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -200,7 +216,7 @@ Task {
 
 ---
 
-### **3. СВЯЗИ С ДРУГИМИ МОДЕЛЯМИ**
+### **Связи с другими моделями**
 
 ```
 Task
@@ -211,14 +227,15 @@ Task
   ├── devices → Device
   ├── agentDeviceConnections.agentId → Agent
   ├── agentDeviceConnections.deviceId → Device
+  ├── agentComputerConnections.agentId → Agent
+  ├── agentComputerConnections.computerId → Computer
   ├── result.physicalStatus.deviceId → Device
-  ├── Project (через массив в Project)
   └── Transaction (через taskId)
 ```
 
 ---
 
-### **4. ИНДЕКСЫ**
+### **Индексы**
 
 ```javascript
 Task.index({ creator: 1, status: 1 })
@@ -226,5 +243,5 @@ Task.index({ users: 1, status: 1 })
 Task.index({ agents: 1, status: 1 })
 Task.index({ status: 1, createdAt: -1 })
 Task.index({ 'agentDeviceConnections.status': 1 })
+Task.index({ 'agentComputerConnections.status': 1 })
 ```
-

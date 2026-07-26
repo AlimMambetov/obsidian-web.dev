@@ -1,27 +1,26 @@
 ---
 title: Маркетплейс
 ---
-
-## 🏪 **MARKETPLACE LISTING (Маркетплейс)**
+## 🏪 **МАРКЕТПЛЕЙС (MARKETPLACE LISTING)**
 
 ---
 
-### **1. СХЕМА MARKETPLACE LISTING**
+### **Схема**
 
 ```javascript
 MarketplaceListing {
   _id: ObjectId
   agentId: ObjectId -> Agent, required
   sellerId: ObjectId -> User, required
-  
+
   // ========== ЦЕНЫ ==========
   pricePerCall: number
   subscriptionPrice: number
-  
+
   // ========== СТАТИСТИКА ==========
   totalSales: number, default: 0
   totalRevenue: number, default: 0
-  
+
   // ========== ОТЗЫВЫ ==========
   reviews: [{
     userId: ObjectId -> User
@@ -29,10 +28,10 @@ MarketplaceListing {
     comment: string
     createdAt: Date
   }]
-  
+
   // ========== СТАТУС ==========
   status: enum ['active', 'paused', 'archived'], default: 'active'
-  
+
   // ========== АУДИТ ==========
   createdAt: Date
   updatedAt: Date
@@ -41,21 +40,21 @@ MarketplaceListing {
 
 ---
 
-### **2. ОПИСАНИЕ ПОЛЕЙ**
+### **Описание полей**
 
 ---
 
-#### **ОСНОВНЫЕ ПОЛЯ**
+#### **Основные поля**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
-| `_id` | ObjectId | Да | Уникальный ID листинга |
+| `_id` | ObjectId | Да | Уникальный идентификатор листинга |
 | `agentId` | ObjectId -> Agent | Да | Какой агент продается |
 | `sellerId` | ObjectId -> User | Да | Кто продает |
 
 ---
 
-#### **ЦЕНЫ**
+#### **Цены**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -64,7 +63,7 @@ MarketplaceListing {
 
 ---
 
-#### **СТАТИСТИКА**
+#### **Статистика**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -73,7 +72,7 @@ MarketplaceListing {
 
 ---
 
-#### **ОТЗЫВЫ**
+#### **Отзывы**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -84,7 +83,7 @@ MarketplaceListing {
 
 ---
 
-#### **СТАТУС**
+#### **Статус**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -92,7 +91,7 @@ MarketplaceListing {
 
 ---
 
-### **3. СВЯЗИ С ДРУГИМИ МОДЕЛЯМИ**
+### **Связи с другими моделями**
 
 ```
 MarketplaceListing
@@ -103,7 +102,7 @@ MarketplaceListing
 
 ---
 
-### **4. ИНДЕКСЫ**
+### **Индексы**
 
 ```javascript
 MarketplaceListing.index({ status: 1, pricePerCall: 1 })
@@ -111,4 +110,3 @@ MarketplaceListing.index({ sellerId: 1, status: 1 })
 MarketplaceListing.index({ agentId: 1 }, { unique: true })
 MarketplaceListing.index({ 'reviews.rating': -1 })
 ```
-

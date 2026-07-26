@@ -1,12 +1,11 @@
 ---
 title: Робот
 ---
-
-## 🛠️ **DEVICE (Устройство/Робот)**
+## 🛠️ **РОБОТ/УСТРОЙСТВО (DEVICE)**
 
 ---
 
-### **1. СХЕМА DEVICE**
+### **Схема**
 
 ```javascript
 Device {
@@ -14,40 +13,44 @@ Device {
   name: string, required
   description: string
   creator: ObjectId -> User, required
-  
+
   // ========== КОМПЕТЕНЦИИ ==========
   competencies: [ObjectId -> Competency]
-  
+
   // ========== ТИП ==========
   type: enum ['3d_printer_plastic', '3d_printer_metal', 'welder', 'miller', 'cnc']
-  
+
   // ========== РАСПОЛОЖЕНИЕ ==========
   location: {
     address: string
     coordinates: { lat: number, lng: number }
   }
-  
+
+  ipAddress: string
+
   // ========== ПРОТОКОЛ ==========
   protocol: enum ['gcode', 'modbus', 'opcua', 'custom'], default: 'gcode'
   protocolConfig: Mixed
-  
+
   // ========== СТОИМОСТЬ ==========
   pricing: {
     costPerHour: number
     costPerGram: number
   }
-  
+
   // ========== УЗЛЫ ==========
   nodes: [{
     name: string, required
+    url: string
     type: enum ['joint', 'actuator', 'sensor', 'controller', 'tool']
     location: { x: number, y: number, z: number }
     dimensions: { width: number, height: number, depth: number }
+    orientation: { pitch: number, yaw: number, roll: number }
     parentNode: string
     modelUrl: string
     fileUrl: string
   }]
-  
+
   // ========== ХАРАКТЕРИСТИКИ ==========
   specs: {
     maxSize: string
@@ -57,7 +60,7 @@ Device {
     temperature: number
     speed: number
   }
-  
+
   // ========== ВИЗУАЛ (ГОТОВЫЙ ОТ НАС) ==========
   visual: {
     '2d': {
@@ -75,11 +78,11 @@ Device {
       }
     }
   }
-  
+
   // ========== СТАТУС ==========
   status: enum ['idle', 'busy', 'maintenance', 'offline'], default: 'idle'
   currentTask: ObjectId -> Task
-  
+
   // ========== АУДИТ ==========
   createdAt: Date
   updatedAt: Date
@@ -88,22 +91,23 @@ Device {
 
 ---
 
-### **2. ОПИСАНИЕ ПОЛЕЙ**
+### **Описание полей**
 
 ---
 
-#### **ОСНОВНЫЕ ПОЛЯ**
+#### **Основные поля**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
-| `_id` | ObjectId | Да | Уникальный ID устройства |
+| `_id` | ObjectId | Да | Уникальный идентификатор устройства |
 | `name` | string | Да | Название устройства |
 | `description` | string | Нет | Описание |
 | `creator` | ObjectId -> User | Да | Кто добавил устройство |
+| `ipAddress` | string | Нет | IP адрес робота |
 
 ---
 
-#### **КОМПЕТЕНЦИИ И ТИП**
+#### **Компетенции и тип**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -112,7 +116,7 @@ Device {
 
 ---
 
-#### **РАСПОЛОЖЕНИЕ**
+#### **Расположение**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -122,7 +126,7 @@ Device {
 
 ---
 
-#### **ПРОТОКОЛ**
+#### **Протокол**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -131,7 +135,7 @@ Device {
 
 ---
 
-#### **СТОИМОСТЬ**
+#### **Стоимость**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -140,21 +144,23 @@ Device {
 
 ---
 
-#### **УЗЛЫ**
+#### **Узлы**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
 | `nodes[].name` | string | Да | Название узла |
+| `nodes[].url` | string | Нет | Ссылка на конкретный узел прибора |
 | `nodes[].type` | enum | Нет | `'joint'`, `'actuator'`, `'sensor'`, `'controller'`, `'tool'` |
 | `nodes[].location` | object | Нет | Координаты: x, y, z |
 | `nodes[].dimensions` | object | Нет | Размеры: width, height, depth |
+| `nodes[].orientation` | object | Нет | Ориентация: pitch, yaw, roll |
 | `nodes[].parentNode` | string | Нет | Ссылка на родительский узел |
 | `nodes[].modelUrl` | string | Нет | 3D модель узла |
 | `nodes[].fileUrl` | string | Нет | Ссылка на файл узла |
 
 ---
 
-#### **ХАРАКТЕРИСТИКИ**
+#### **Характеристики**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -167,7 +173,7 @@ Device {
 
 ---
 
-#### **ВИЗУАЛ**
+#### **Визуал**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -182,7 +188,7 @@ Device {
 
 ---
 
-#### **СТАТУС**
+#### **Статус**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -191,7 +197,7 @@ Device {
 
 ---
 
-### **3. СВЯЗИ С ДРУГИМИ МОДЕЛЯМИ**
+### **Связи с другими моделями**
 
 ```
 Device
@@ -199,12 +205,12 @@ Device
   ├── competencies → Competency
   ├── currentTask → Task
   ├── Task (через массив в Task)
-  └── Agent (через agentDeviceConnections в Task)
+  └── agentDeviceConnections → Task
 ```
 
 ---
 
-### **4. ИНДЕКСЫ**
+### **Индексы**
 
 ```javascript
 Device.index({ status: 1, type: 1 })
@@ -212,4 +218,3 @@ Device.index({ competencies: 1 })
 Device.index({ creator: 1 })
 Device.index({ 'location.coordinates': '2dsphere' })
 ```
-

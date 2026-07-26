@@ -1,12 +1,11 @@
 ---
 title: ИИ-Агент
 ---
-
-## 🤖 **AGENT (ИИ-агент)**
+## 🤖 **АГЕНТ (AGENT)**
 
 ---
 
-### **1. СХЕМА AGENT**
+### **Схема**
 
 ```javascript
 Agent {
@@ -14,10 +13,12 @@ Agent {
   name: string, required
   description: string
   creator: ObjectId -> User, required
-  
+
   // ========== КОМПЕТЕНЦИИ ==========
   competencies: [ObjectId -> Competency]
-  
+
+  url: string
+
   // ========== ТРЕБОВАНИЯ К РЕСУРСАМ ==========
   requirements: {
     gpu: number
@@ -25,17 +26,16 @@ Agent {
     ram: number
     storage: number
   }
-  
+
   // ========== СТОИМОСТЬ (МАРКЕТПЛЕЙС) ==========
   pricing: {
     pricePerCall: number
     subscriptionPrice: number
     commissionRate: number, default: 30
   }
-  
+
   // ========== ВНЕШНОСТЬ (КАСТОМИЗАЦИЯ) ==========
   appearance: {
-    // 2D режим
     '2d': {
       spriteUrl: string
       emotionSprites: {
@@ -46,7 +46,6 @@ Agent {
         thinking: string
       }
     }
-    // 3D режим
     '3d': {
       modelUrl: string
       animations: {
@@ -59,7 +58,6 @@ Agent {
         listening: string
       }
     }
-    // Кастомизация (общая)
     customization: {
       bodyColor: string
       skinColor: string
@@ -75,7 +73,7 @@ Agent {
       }
     }
   }
-  
+
   // ========== КОГНИТИВНЫЕ УЗЛЫ ==========
   cognitiveNodes: [{
     name: string, required
@@ -83,27 +81,7 @@ Agent {
     fileUrl: string
     config: Mixed
   }]
-  
-  // ========== МОДЕЛИ АГЕНТА ==========
-  models: [{
-    modelId: ObjectId -> Model
-    version: string
-    isActive: boolean, default: false
-    publishedAt: Date
-  }]
-  
-  activeModel: {
-    modelId: ObjectId -> Model
-    version: string
-    activatedAt: Date
-  }
-  
-  modelSource: {
-    type: enum ['local', 'cloud', 'api']
-    machineId: string
-    serverId: string
-  }
-  
+
   // ========== ОБУЧЕНИЕ ==========
   trainingData: {
     files: [{
@@ -113,7 +91,7 @@ Agent {
     }]
     lastTrained: Date
   }
-  
+
   // ========== СТАТИСТИКА ==========
   stats: {
     tasksCompleted: number, default: 0
@@ -121,12 +99,12 @@ Agent {
     successRate: number, default: 100
     rating: number, min:0, max:5
   }
-  
+
   // ========== СТАТУС ==========
   status: enum ['draft', 'published', 'archived'], default: 'draft'
   version: string
   lastTrainedAt: Date
-  
+
   // ========== АУДИТ ==========
   createdAt: Date
   updatedAt: Date
@@ -135,22 +113,23 @@ Agent {
 
 ---
 
-### **2. ОПИСАНИЕ ПОЛЕЙ**
+### **Описание полей**
 
 ---
 
-#### **ОСНОВНЫЕ ПОЛЯ**
+#### **Основные поля**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
-| `_id` | ObjectId | Да | Уникальный ID агента |
+| `_id` | ObjectId | Да | Уникальный идентификатор агента |
 | `name` | string | Да | Название агента |
 | `description` | string | Нет | Описание возможностей агента |
 | `creator` | ObjectId -> User | Да | Создатель агента |
+| `url` | string | Нет | Ссылка на самого агента (API endpoint) |
 
 ---
 
-#### **КОМПЕТЕНЦИИ**
+#### **Компетенции**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -158,7 +137,7 @@ Agent {
 
 ---
 
-#### **ТРЕБОВАНИЯ К РЕСУРСАМ**
+#### **Требования к ресурсам**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -169,7 +148,7 @@ Agent {
 
 ---
 
-#### **СТОИМОСТЬ (МАРКЕТПЛЕЙС)**
+#### **Стоимость (маркетплейс)**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -179,7 +158,7 @@ Agent {
 
 ---
 
-#### **ВНЕШНОСТЬ (КАСТОМИЗАЦИЯ)**
+#### **Внешность (кастомизация)**
 
 **2D режим:**
 
@@ -220,35 +199,18 @@ Agent {
 
 ---
 
-#### **КОГНИТИВНЫЕ УЗЛЫ**
+#### **Когнитивные узлы**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
 | `cognitiveNodes[].name` | string | Да | Название узла |
-| `cognitiveNodes[].type` | enum | Нет | Тип узла: `'input'`, `'processing'`, `'output'`, `'memory'`, `'decision'` |
+| `cognitiveNodes[].type` | enum | Нет | `'input'`, `'processing'`, `'output'`, `'memory'`, `'decision'` |
 | `cognitiveNodes[].fileUrl` | string | Нет | Ссылка на файл узла |
 | `cognitiveNodes[].config` | Mixed | Нет | Конфигурация узла |
 
 ---
 
-#### **МОДЕЛИ АГЕНТА**
-
-| Поле | Тип | Обязательное | Описание |
-|------|-----|--------------|----------|
-| `models[].modelId` | ObjectId -> Model | Да | Ссылка на модель |
-| `models[].version` | string | Да | Версия модели |
-| `models[].isActive` | boolean | Да, default: false | Активна ли модель |
-| `models[].publishedAt` | Date | Нет | Дата публикации |
-| `activeModel.modelId` | ObjectId -> Model | Нет | Активная модель |
-| `activeModel.version` | string | Нет | Версия активной модели |
-| `activeModel.activatedAt` | Date | Нет | Дата активации |
-| `modelSource.type` | enum | Нет | Источник: `'local'`, `'cloud'`, `'api'` |
-| `modelSource.machineId` | string | Нет | ID машины (локально) |
-| `modelSource.serverId` | string | Нет | ID сервера (облачно) |
-
----
-
-#### **ОБУЧЕНИЕ**
+#### **Обучение**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -260,7 +222,7 @@ Agent {
 
 ---
 
-#### **СТАТИСТИКА**
+#### **Статистика**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -271,17 +233,17 @@ Agent {
 
 ---
 
-#### **СТАТУС**
+#### **Статус**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
-| `status` | enum | Да, default: 'draft' | `'draft'` / `'published'` / `'archived'` |
+| `status` | enum | Да, default: 'draft' | `'draft'`, `'published'`, `'archived'` |
 | `version` | string | Нет | Версия агента |
 | `lastTrainedAt` | Date | Нет | Дата последнего обучения |
 
 ---
 
-#### **АУДИТ**
+#### **Аудит**
 
 | Поле | Тип | Обязательное | Описание |
 |------|-----|--------------|----------|
@@ -290,40 +252,25 @@ Agent {
 
 ---
 
-### **3. СВЯЗИ С ДРУГИМИ МОДЕЛЯМИ**
+### **Связи с другими моделями**
 
 ```
 Agent
-  ├── creator → User (создатель)
-  ├── competencies → Competency (компетенции)
-  ├── models.modelId → Model (модели)
-  ├── activeModel.modelId → Model (активная модель)
+  ├── creator → User
+  ├── competencies → Competency
   ├── Task (через массив в Task)
   ├── MarketplaceListing (через agentId)
-  └── TrainingProcess (через agentId)
+  └── agentDeviceConnections → Task
+  └── agentComputerConnections → Task
 ```
 
 ---
 
-### **4. ИНДЕКСЫ**
+### **Индексы**
 
 ```javascript
 Agent.index({ creator: 1, status: 1 })
-Agent.index({ 'models.modelId': 1 })
 Agent.index({ name: 'text', description: 'text' })
 Agent.index({ 'pricing.pricePerCall': 1, status: 1 })
 Agent.index({ status: 1, 'stats.rating': -1 })
 ```
-
----
-
-### **5. ВОЗМОЖНОСТИ АГЕНТА**
-
-| Возможность      | Описание                                   |
-| ---------------- | ------------------------------------------ |
-| **Создание**     | Создатель может создать агента с нуля      |
-| **Кастомизация** | Настройка внешности (2D/3D, цвета, одежда) |
-| **Обучение**     | Привязка обученных моделей                 |
-| **Публикация**   | Выставление в маркетплейс                  |
-| **Статистика**   | Отслеживание производительности            |
-| **Обновление**   | Обновление версий и моделей                |
