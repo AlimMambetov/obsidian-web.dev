@@ -1,3 +1,0 @@
----
-title: Frontend | AI Интерфейс
----
